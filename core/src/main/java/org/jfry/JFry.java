@@ -19,7 +19,7 @@ public class JFry implements LifeCycle {
   }
 
   public JFry register(Route... routes) {
-    return new JFry(this.routes.appendAll(List.of(routes)), server, port);
+    return new JFry(this.routes.prependAll(List.of(routes)), server, port);
   }
 
   private Response handle(Request request) {

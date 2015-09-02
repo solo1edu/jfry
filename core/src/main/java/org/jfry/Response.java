@@ -31,9 +31,8 @@ class Response {
     return body.isDefined() && !body.map(String::isEmpty).orElse(true);
   }
 
-  public Response ifHasBody(Consumer<String> consumer) {
+  public void ifHasBody(Consumer<String> consumer) {
     body.forEach(consumer);
-    return this;
   }
 
   public Response ok(String body) {
