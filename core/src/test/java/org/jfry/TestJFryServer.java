@@ -1,55 +1,50 @@
 package org.jfry;
 
-import javaslang.control.Option;
 import javaslang.control.Try;
-import org.jfry.HttpMethod;
-import org.jfry.JFryServer;
-import org.jfry.Request;
-import org.jfry.Response;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class TestJFryServer implements JFryServer {
   private Handler handler;
 
-  public Response simulateOptions(String path) {
-    Request fakeRequest = new Request(HttpMethod.OPTIONS, path, new HashMap<>(), new HashMap<>(), Option.none());
+  private Response simulate(HttpMethod method, String uri) {
+    String path = uri.contains("?") ? uri.substring(0, uri.indexOf("?")) : uri;
+    Map<String, String> query = uri.contains("?") ? decodeQueryString(uri.substring(uri.indexOf("?")+1)) : new HashMap<>();
+    Request fakeRequest = Request.of(method, path, new HashMap<>(), query, () -> null);
     return handler.apply(fakeRequest);
   }
 
-  public Response simulateGet(String path) {
-    Request fakeRequest = new Request(HttpMethod.GET, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulateOptions(String uri) {
+    return simulate(HttpMethod.OPTIONS, uri);
   }
 
-  public Response simulateHead(String path) {
-    Request fakeRequest = new Request(HttpMethod.HEAD, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulateGet(String uri) {
+    return simulate(HttpMethod.GET, uri);
   }
 
-  public Response simulatePost(String path) {
-    Request fakeRequest = new Request(HttpMethod.POST, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulateHead(String uri) {
+    return simulate(HttpMethod.HEAD, uri);
   }
 
-  public Response simulatePut(String path) {
-    Request fakeRequest = new Request(HttpMethod.PUT, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulatePost(String uri) {
+    return simulate(HttpMethod.POST, uri);
   }
 
-  public Response simulateDelete(String path) {
-    Request fakeRequest = new Request(HttpMethod.DELETE, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulatePut(String uri) {
+    return simulate(HttpMethod.PUT, uri);
   }
 
-  public Response simulateTrace(String path) {
-    Request fakeRequest = new Request(HttpMethod.TRACE, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulateDelete(String uri) {
+    return simulate(HttpMethod.DELETE, uri);
   }
 
-  public Response simulateConnect(String path) {
-    Request fakeRequest = new Request(HttpMethod.CONNECT, path, new HashMap<>(), new HashMap<>(), Option.none());
-    return handler.apply(fakeRequest);
+  public Response simulateTrace(String uri) {
+    return simulate(HttpMethod.TRACE, uri);
+  }
+
+  public Response simulateConnect(String uri) {
+    return simulate(HttpMethod.CONNECT, uri);
   }
 
   @Override

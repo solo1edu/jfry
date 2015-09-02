@@ -1,7 +1,7 @@
 package org.jfry;
 
-import javaslang.control.Option;
 import javaslang.control.Try;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class JFryServerJettyAdapter implements JFryServer {
   private final Server server;
@@ -35,10 +36,8 @@ public class JFryServerJettyAdapter implements JFryServer {
   public JFryServerJettyAdapter onRequest(Handler handler) {
     server.setHandler(new AbstractHandler() {
       @Override
-      public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+      public void handle(String path, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpMethod method = HttpMethod.valueOf(baseRequest.getMethod().toUpperCase());
-        // Params from Request depending on matching route
-        Map<String, String> params = new HashMap<>();
 
         // Request creation
         Map<String, String> headers = new HashMap<>();
@@ -47,7 +46,10 @@ public class JFryServerJettyAdapter implements JFryServer {
           String name = headerNames.nextElement();
           headers.put(name, request.getHeader(name));
         }
-        Request jfryRequest = new Request(method, target, params, headers, Option.none());
+
+        Map<String, String> query = decodeQueryString(request.getQueryString());
+
+        Request jfryRequest = Request.of(method, request.getPathInfo(), headers, query, bodyReader(request));
 
         // Response creation
         Response jfryResponse = handler.apply(jfryRequest);
@@ -66,6 +68,10 @@ public class JFryServerJettyAdapter implements JFryServer {
       }
     });
     return this;
+  }
+
+  private Supplier<String> bodyReader(HttpServletRequest request) {
+    return () -> Try.of(request::getInputStream).map(IOUtils::toString).get();
   }
 
   @Override

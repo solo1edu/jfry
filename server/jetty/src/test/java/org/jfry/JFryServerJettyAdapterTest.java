@@ -17,4 +17,15 @@ public class JFryServerJettyAdapterTest {
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getCode());
     assertThat(response.getBody()).isEqualTo("bar");
   }
+
+  @Test
+  public void decodes_query_string_params() throws Exception {
+    JFry.of(new JFryServerJettyAdapter(), 8080)
+        .register(Route.get("/foo", request -> request.buildResponse().ok(request.param("bar"))))
+        .start();
+
+    HttpResponse<String> response = Unirest.get("http://localhost:8080/foo?bar=123").asString();
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getCode());
+    assertThat(response.getBody()).isEqualTo("bar");
+  }
 }

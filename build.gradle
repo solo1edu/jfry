@@ -4,7 +4,8 @@ def versions = [
     'junit'    : '4.12',
     'javaslang': '1.2.2',
     'assertj'  : '3.1.0',
-    'unirest'  : '1.4.7'
+    'unirest'  : '1.4.7',
+    'commonsIo': '2.4'
 ]
 
 allprojects {
@@ -25,6 +26,7 @@ allprojects {
     compile "org.eclipse.jetty:jetty-servlets:$versions.jetty"
     compile "ch.qos.logback:logback-classic:$versions.logback"
     compile "com.javaslang:javaslang:$versions.javaslang"
+    compile "commons-io:commons-io:$versions.commonsIo"
     testCompile "junit:junit:$versions.junit"
     testCompile "org.assertj:assertj-core:$versions.assertj"
   }

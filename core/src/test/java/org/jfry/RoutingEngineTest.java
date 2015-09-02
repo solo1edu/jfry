@@ -41,7 +41,7 @@ public class RoutingEngineTest {
   }
 
   @Test
-  public void captures_dynamic_path_part_values_and_makes_them_available() throws Exception {
+  public void makes_dynamic_path_part_values_available() throws Exception {
     JFry.of(server, 8080)
         .register(Route.get("/foo/:bar/baz", (Request req) -> req.buildResponse().ok(req.param("bar"))))
         .start();
@@ -101,5 +101,31 @@ public class RoutingEngineTest {
       assertThat(response.hasBody()).isTrue();
       assertThat(response.getBody()).isEqualTo("bar");
     });
+  }
+
+  @Test
+  public void makes_query_string_params_available() throws Exception {
+    JFry.of(server, 8080)
+        .register(Route.get("/foo", (Request req) -> req.buildResponse().ok(req.param("bar"))))
+        .start();
+
+    Response response = server.simulateGet("/foo?bar=123");
+
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
+    assertThat(response.hasBody()).isTrue();
+    assertThat(response.getBody()).isEqualTo("123");
+  }
+
+  @Test
+  public void dynamic_path_parts_have_precedence_over_query_string_params() throws Exception {
+    JFry.of(server, 8080)
+        .register(Route.get("/foo/:bar/baz", (Request req) -> req.buildResponse().ok(req.param("bar"))))
+        .start();
+
+    Response response = server.simulateGet("/foo/123/baz?bar=456");
+
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
+    assertThat(response.hasBody()).isTrue();
+    assertThat(response.getBody()).isEqualTo("123");
   }
 }
