@@ -37,9 +37,9 @@ public class JFryServerJettyAdapter implements JFryServer {
     server.setHandler(new AbstractHandler() {
       @Override
       public void handle(String path, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // Request creation
         HttpMethod method = HttpMethod.valueOf(baseRequest.getMethod().toUpperCase());
 
-        // Request creation
         Map<String, String> headers = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
