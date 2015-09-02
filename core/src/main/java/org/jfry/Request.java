@@ -4,6 +4,7 @@ import javaslang.control.Option;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 class Request {
@@ -32,9 +33,20 @@ class Request {
   }
 
   String param(String name) {
-    return Option
-        .of(params.get(name))
-        .orElseThrow(() -> new UnknownRequestParamException(name));
+    return Option.of(params.get(name)).orElseThrow(() -> new UnknownRequestParamException(this, name));
+  }
+
+  public <T> Option<T> mapParam(String name, Function<String, T> mapper) {
+    return Option.of(params.get(name)).map(mapper);
+  }
+
+  public String header(String name) {
+    return Option.of(headers.get(name)).orElseThrow(() -> new UnknownRequestHeaderException(this, name));
+  }
+
+  public <T> Option<T> mapHeader(String name, Function<String, T> mapper) {
+    return Option.of(headers.get(name)).map(mapper);
+
   }
 
   String getPath() {

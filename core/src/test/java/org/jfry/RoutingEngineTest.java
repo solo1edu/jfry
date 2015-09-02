@@ -1,5 +1,6 @@
 package org.jfry;
 
+import javaslang.Tuple2;
 import javaslang.collection.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class RoutingEngineTest {
   @Test
   public void resolves_simple_paths() throws Exception {
     JFry.of(server, 8080)
-        .register(Route.get("/foo", (Request req) -> req.buildResponse().ok("bar")))
+        .register(Route.get("/foo", req -> req.buildResponse().ok("bar")))
         .start();
 
     Response response = server.simulateGet("/foo");
@@ -31,7 +32,7 @@ public class RoutingEngineTest {
   @Test
   public void returns_not_found_response_if_no_handler_is_found() throws Exception {
     JFry.of(server, 8080)
-        .register(Route.get("/foo", (Request req) -> req.buildResponse().ok("bar")))
+        .register(Route.get("/foo", req -> req.buildResponse().ok("bar")))
         .start();
 
     Response response = server.simulateGet("/bar");
@@ -43,7 +44,7 @@ public class RoutingEngineTest {
   @Test
   public void makes_dynamic_path_part_values_available() throws Exception {
     JFry.of(server, 8080)
-        .register(Route.get("/foo/:bar/baz", (Request req) -> req.buildResponse().ok(req.param("bar"))))
+        .register(Route.get("/foo/:bar/baz", req -> req.buildResponse().ok(req.param("bar"))))
         .start();
 
     Response response = server.simulateGet("/foo/123/baz");
@@ -57,8 +58,8 @@ public class RoutingEngineTest {
   public void resolves_handlers_depending_on_http_method() throws Exception {
     JFry.of(server, 8080)
         .register(
-            Route.get("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.post("/foo", (Request req) -> req.buildResponse().ok("baz"))
+            Route.get("/foo", req -> req.buildResponse().ok("bar")),
+            Route.post("/foo", req -> req.buildResponse().ok("baz"))
         ).start();
 
     Response getResponse = server.simulateGet("/foo");
@@ -77,14 +78,14 @@ public class RoutingEngineTest {
   public void supports_all_http_1_1_methods() throws Exception {
     JFry.of(server, 8080)
         .register(
-            Route.options("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.get("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.head("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.post("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.put("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.delete("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.trace("/foo", (Request req) -> req.buildResponse().ok("bar")),
-            Route.connect("/foo", (Request req) -> req.buildResponse().ok("bar"))
+            Route.options("/foo", req -> req.buildResponse().ok("bar")),
+            Route.get("/foo", req -> req.buildResponse().ok("bar")),
+            Route.head("/foo", req -> req.buildResponse().ok("bar")),
+            Route.post("/foo", req -> req.buildResponse().ok("bar")),
+            Route.put("/foo", req -> req.buildResponse().ok("bar")),
+            Route.delete("/foo", req -> req.buildResponse().ok("bar")),
+            Route.trace("/foo", req -> req.buildResponse().ok("bar")),
+            Route.connect("/foo", req -> req.buildResponse().ok("bar"))
         ).start();
 
     List.of(
@@ -106,7 +107,7 @@ public class RoutingEngineTest {
   @Test
   public void makes_query_string_params_available() throws Exception {
     JFry.of(server, 8080)
-        .register(Route.get("/foo", (Request req) -> req.buildResponse().ok(req.param("bar"))))
+        .register(Route.get("/foo", req -> req.buildResponse().ok(req.param("bar"))))
         .start();
 
     Response response = server.simulateGet("/foo?bar=123");
@@ -119,7 +120,7 @@ public class RoutingEngineTest {
   @Test
   public void dynamic_path_parts_have_precedence_over_query_string_params() throws Exception {
     JFry.of(server, 8080)
-        .register(Route.get("/foo/:bar/baz", (Request req) -> req.buildResponse().ok(req.param("bar"))))
+        .register(Route.get("/foo/:bar/baz", req -> req.buildResponse().ok(req.param("bar"))))
         .start();
 
     Response response = server.simulateGet("/foo/123/baz?bar=456");
@@ -127,5 +128,20 @@ public class RoutingEngineTest {
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(response.hasBody()).isTrue();
     assertThat(response.getBody()).isEqualTo("123");
+  }
+
+  @Test
+  public void lets_you_add_extra_custom_conditions_for_matching_requests() throws Exception {
+    Route foo = Route.get("/foo", req -> req.buildResponse().ok("bar"))
+        .withConditions(request -> request.mapHeader("doge", doge -> doge.equals("very wow")).orElse(false));
+    JFry.of(server, 8080)
+        .register(foo)
+        .start();
+
+    Response shouldNotWorkResponse = server.simulateGet("/foo");
+    Response shouldWorkResponse = server.simulateGet("/foo", new Tuple2<>("doge", "very wow"));
+
+    assertThat(shouldNotWorkResponse.getStatus()).isEqualTo(Response.Status.NOT_FOUND);
+    assertThat(shouldWorkResponse.getStatus()).isEqualTo(Response.Status.OK);
   }
 }
