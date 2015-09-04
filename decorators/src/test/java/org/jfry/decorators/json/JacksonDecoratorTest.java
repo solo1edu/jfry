@@ -26,7 +26,7 @@ public class JacksonDecoratorTest {
       return req.buildResponse().ok(req.getBody());
     };
 
-    Handler decoratedHandler = handler.compose(JacksonDecorator.deserialize()).andThen(JacksonDecorator.serialize());
+    Handler decoratedHandler = Handler.of(JacksonDecorator.deserialize().andThen(handler).andThen(JacksonDecorator.serialize()));
 
     JFry.of(server, 8080)
         .post("/foo", decoratedHandler)

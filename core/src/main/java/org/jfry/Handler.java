@@ -16,4 +16,8 @@ public interface Handler extends Function<Request, Response> {
   default Handler compose(RequestDecorator decorator) {
     return request -> apply(decorator.apply(request));
   }
+
+  static Handler of(Function<Request, Response> handlerLikeFn) {
+    return handlerLikeFn::apply;
+  }
 }
