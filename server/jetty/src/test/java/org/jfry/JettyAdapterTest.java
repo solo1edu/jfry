@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JFryServerJettyAdapterTest {
+public class JettyAdapterTest {
   @Test
   public void starts_a_Jetty_server_and_uses_it_to_serve_requests() throws Exception {
-    JFry.of(new JFryServerJettyAdapter(), 8080)
+    JFry.of(new JettyAdapter(), 8080)
         .register(Route.get("/foo", request -> request.buildResponse().ok("bar")))
         .start();
 
@@ -20,7 +20,7 @@ public class JFryServerJettyAdapterTest {
 
   @Test
   public void decodes_query_string_params() throws Exception {
-    JFry.of(new JFryServerJettyAdapter(), 8080)
+    JFry.of(new JettyAdapter(), 8080)
         .register(Route.get("/foo", request -> request.buildResponse().ok(request.param("bar"))))
         .start();
 

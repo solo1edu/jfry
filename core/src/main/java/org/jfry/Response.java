@@ -4,12 +4,12 @@ import javaslang.control.Option;
 
 import java.util.function.Consumer;
 
-class Response {
+public class Response {
   private final Request request;
   private final Status status;
-  private final Option<String> body;
+  private final Option<Object> body;
 
-  Response(Request request, Status status, Option<String> body) {
+  Response(Request request, Status status, Option<Object> body) {
     this.request = request;
     this.status = status;
     this.body = body;
@@ -23,19 +23,23 @@ class Response {
     return status;
   }
 
-  public String getBody() {
-    return body.orElse("");
+  public <T> T getBody() {
+    return (T) body.get();
   }
 
   public boolean hasBody() {
-    return body.isDefined() && !body.map(String::isEmpty).orElse(true);
+    return body.isDefined();
   }
 
-  public void ifHasBody(Consumer<String> consumer) {
-    body.forEach(consumer);
+  public <T> void ifHasBody(Consumer<T> consumer) {
+    consumer.accept(getBody());
   }
 
-  public Response ok(String body) {
+  public Response withBody(Object body) {
+    return new Response(request, status, Option.of(body));
+  }
+
+  public Response ok(Object body) {
     return new Response(request, Status.OK, Option.of(body));
   }
 

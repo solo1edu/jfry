@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-class Request {
+public class Request {
   private final HttpMethod method;
   private final String path;
   private final Map<String, String> headers;
   private final Map<String, String> query;
   private final Map<String, String> params;
-  private final Supplier<String> bodySupplier;
+  private final Supplier<Object> bodySupplier;
 
-  Request(HttpMethod method, String path, Map<String, String> headers, Map<String, String> query, Map<String, String> params, Supplier<String> bodySupplier) {
+  Request(HttpMethod method, String path, Map<String, String> headers, Map<String, String> query, Map<String, String> params, Supplier bodySupplier) {
     this.method = method;
     this.path = path;
     this.params = params;
@@ -28,7 +28,7 @@ class Request {
     return new Request(method, path, headers, query, new HashMap<>(), new MemoizingSupplier<>(bodySupplier));
   }
 
-  Response buildResponse() {
+  public Response buildResponse() {
     return Response.from(this);
   }
 
@@ -36,7 +36,7 @@ class Request {
     return Option.of(params.get(name)).orElseThrow(() -> new UnknownRequestParamException(this, name));
   }
 
-  public <T> Option<T> mapParam(String name, Function<String, T> mapper) {
+  public <U> Option<U> mapParam(String name, Function<String, U> mapper) {
     return Option.of(params.get(name)).map(mapper);
   }
 
@@ -44,7 +44,7 @@ class Request {
     return Option.of(headers.get(name)).orElseThrow(() -> new UnknownRequestHeaderException(this, name));
   }
 
-  public <T> Option<T> mapHeader(String name, Function<String, T> mapper) {
+  public <U> Option<U> mapHeader(String name, Function<String, U> mapper) {
     return Option.of(headers.get(name)).map(mapper);
 
   }
@@ -61,9 +61,18 @@ class Request {
     return new Request(method, path, headers, query, params, bodySupplier);
   }
 
+  public Request withBody(Object body) {
+    return new Request(method, path, headers, query, params, () -> body);
+  }
+
   public Map<String, String> getQuery() {
     return query;
   }
+
+  public <T> T getBody() {
+    return (T) bodySupplier.get();
+  }
+
 
   /*
    * Copied from https://github.com/google/guava/blob/2b9d1761e6f913cbe044f1b80033e555e1500539/guava/src/com/google/common/base/Suppliers.java#L114

@@ -1,1 +1,1 @@
-include 'core', 'server:jetty'
+include 'core', 'server:jetty', 'decorators'

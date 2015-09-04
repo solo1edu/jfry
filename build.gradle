@@ -5,7 +5,8 @@ def versions = [
     'javaslang': '1.2.2',
     'assertj'  : '3.1.0',
     'unirest'  : '1.4.7',
-    'commonsIo': '2.4'
+    'commonsIo': '2.4',
+    'jackson'  : '2.3.2'
 ]
 
 allprojects {
@@ -36,5 +37,13 @@ project(':server:jetty') {
   dependencies {
     compile project(':core')
     compile "com.mashape.unirest:unirest-java:$versions.unirest"
+  }
+}
+
+project(':decorators') {
+  dependencies {
+    compile project(':core')
+    compile "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+    compile "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
   }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public class Route implements Handler {
+public class Route {
   private final HttpMethod method;
   private final String path;
   private final Handler handler;
@@ -81,7 +81,6 @@ public class Route implements Handler {
         .fold(true, Boolean::logicalAnd);
   }
 
-  @Override
   public Response apply(Request request) {
     Map<String, String> params = new HashMap<>();
 

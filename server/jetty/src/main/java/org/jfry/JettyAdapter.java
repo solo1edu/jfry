@@ -17,15 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class JFryServerJettyAdapter implements JFryServer {
+public class JettyAdapter implements JFryServer {
   private final Server server;
 
-  public JFryServerJettyAdapter() {
+  public JettyAdapter() {
     this.server = new Server();
   }
 
   @Override
-  public JFryServerJettyAdapter atPort(int port) {
+  public JettyAdapter atPort(int port) {
     ServerConnector connector = new ServerConnector(server);
     connector.setPort(port);
     server.setConnectors(new Connector[]{connector});
@@ -33,7 +33,7 @@ public class JFryServerJettyAdapter implements JFryServer {
   }
 
   @Override
-  public JFryServerJettyAdapter onRequest(Handler handler) {
+  public JettyAdapter onRequest(Handler handler) {
     server.setHandler(new AbstractHandler() {
       @Override
       public void handle(String path, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -57,7 +57,7 @@ public class JFryServerJettyAdapter implements JFryServer {
         // Response return
         response.setStatus(jfryResponse.getStatus().getCode());
         headers.keySet().forEach(name -> response.addHeader(name, headers.get(name)));
-        jfryResponse.ifHasBody(body -> Try.run(() -> {
+        jfryResponse.<String>ifHasBody(body -> Try.run(() -> {
           PrintWriter writer = response.getWriter();
           writer.write(body);
           writer.flush();

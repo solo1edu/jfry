@@ -3,7 +3,7 @@ package org.jfry;
 import javaslang.collection.List;
 import javaslang.control.Try;
 
-public class JFry implements LifeCycle {
+public class JFry implements LifeCycle<JFry> {
   private final List<Route> routes;
   private final JFryServer server;
   private final int port;
@@ -22,6 +22,38 @@ public class JFry implements LifeCycle {
     return new JFry(this.routes.prependAll(List.of(routes)), server, port);
   }
 
+  public JFry options(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.options(path, handler)), server, port);
+  }
+
+  public JFry get(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.get(path, handler)), server, port);
+  }
+
+  public JFry head(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.head(path, handler)), server, port);
+  }
+
+  public JFry post(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.post(path, handler)), server, port);
+  }
+
+  public JFry put(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.put(path, handler)), server, port);
+  }
+
+  public JFry delete(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.delete(path, handler)), server, port);
+  }
+
+  public JFry trace(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.trace(path, handler)), server, port);
+  }
+
+  public JFry connect(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.connect(path, handler)), server, port);
+  }
+
   private Response handle(Request request) {
     return List.ofAll(routes)
         .findFirst(r -> r.test(request))
@@ -29,6 +61,7 @@ public class JFry implements LifeCycle {
         .orElseGet(() -> request.buildResponse().notFound());
   }
 
+  @Override
   public Try<JFry> start() {
     return server
         .atPort(port)
