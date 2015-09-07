@@ -60,7 +60,7 @@ class Authenticator {
 jfry.get("/doge", authenticator.authenticate(request -> request.buildResponse.ok("wow"))));
 ``` 
 
-This mode of operation is based on a decorator that returns a new function that comply with a [Handler Functional Interface](https://github.com/ggalmazor/jfry/blob/master/core/src/main/java/org/jfry/Handler.java) and can be used as a Handler itself. This way, your initial Handler doesn't have to know anything about authentication and can be "clean" of dependencies and lines of code that don't have anything to do with your real business logic.
+This mode of operation is based on a decorator that returns a new function that complies with a [Handler Functional Interface](https://github.com/ggalmazor/jfry/blob/master/core/src/main/java/org/jfry/Handler.java) and can be used as a Handler itself. This way, your initial Handler doesn't have to know anything about authentication and can be "clean" of dependencies and lines of code that don't have anything to do with your real business logic.
 
 Sometimes, it's enough to manipulate the Request or the Response method. This is very useful when you need to deal with json content. Let's say that you need to receive a json object from your ursers and then return some other json to them. You could do:
  
