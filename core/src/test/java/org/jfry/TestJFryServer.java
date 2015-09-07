@@ -15,7 +15,7 @@ public class TestJFryServer implements JFryServer {
   private Response simulate(HttpMethod method, String uri, Map<String, String> headers, Option<String> body) {
     String path = uri.contains("?") ? uri.substring(0, uri.indexOf("?")) : uri;
     Map<String, String> query = uri.contains("?") ? decodeQueryString(uri.substring(uri.indexOf("?") + 1)) : new HashMap<>();
-    Request fakeRequest = Request.of(method, path, headers, query, () -> body.orElse(""));
+    Request fakeRequest = Request.of(method, path, headers, query, body.map(b -> (Object) b));
     return handler.apply(fakeRequest);
   }
 

@@ -10,18 +10,23 @@ public class JacksonDecorator {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public static <T> RequestDecorator deserialize() {
-    return request -> {
-      String json = request.getBody();
-      T t = Try.<T>of(() -> OBJECT_MAPPER.readValue(json, new POJOType<T>())).get();
-      return request.withBody(t);
-    };
+    return request -> request.<String, T>mapBody(JacksonDecorator::_deserialize)
+        .map(request::withBody)
+        .orElse(request);
   }
 
   public static ResponseDecorator serialize() {
-    return response -> {
-      String json = Try.of(() -> OBJECT_MAPPER.writeValueAsString(response.getBody())).get();
-      return response.withBody(json);
-    };
+    return response -> response.mapBody(JacksonDecorator::_serialize)
+        .map(response::withBody)
+        .orElse(response);
+  }
+
+  private static <T> T _deserialize(String json) {
+    return Try.<T>of(() -> OBJECT_MAPPER.readValue(json, new POJOType<T>())).get();
+  }
+
+  private static String _serialize(Object obj) {
+    return Try.of(() -> OBJECT_MAPPER.writeValueAsString(obj)).get();
   }
 
 

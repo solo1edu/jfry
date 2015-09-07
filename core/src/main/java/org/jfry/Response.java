@@ -3,6 +3,7 @@ package org.jfry;
 import javaslang.control.Option;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Response {
   private final Request request;
@@ -37,6 +38,10 @@ public class Response {
 
   public Response withBody(Object body) {
     return new Response(request, status, Option.of(body));
+  }
+
+  public <T, U> Option<U> mapBody(Function<T, U> mapper) {
+    return body.map(b -> (T) b).map(mapper);
   }
 
   public Response ok(Object body) {

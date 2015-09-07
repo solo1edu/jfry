@@ -1,5 +1,6 @@
 package org.jfry;
 
+import javaslang.control.Option;
 import javaslang.control.Try;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Connector;
@@ -15,7 +16,6 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class JettyAdapter implements JFryServer {
   private final Server server;
@@ -49,7 +49,9 @@ public class JettyAdapter implements JFryServer {
 
         Map<String, String> query = decodeQueryString(request.getQueryString());
 
-        Request jfryRequest = Request.of(method, request.getPathInfo(), headers, query, bodyReader(request));
+        Option<Object> body = Try.of(request::getInputStream).map(IOUtils::toString).map(b -> (Object) b).toOption();
+
+        Request jfryRequest = Request.of(method, request.getPathInfo(), headers, query, body);
 
         // Response creation
         Response jfryResponse = handler.apply(jfryRequest);
@@ -57,9 +59,9 @@ public class JettyAdapter implements JFryServer {
         // Response return
         response.setStatus(jfryResponse.getStatus().getCode());
         headers.keySet().forEach(name -> response.addHeader(name, headers.get(name)));
-        jfryResponse.<String>ifHasBody(body -> Try.run(() -> {
+        jfryResponse.<String>ifHasBody(_body -> Try.run(() -> {
           PrintWriter writer = response.getWriter();
-          writer.write(body);
+          writer.write(_body);
           writer.flush();
           writer.close();
         }));
@@ -68,10 +70,6 @@ public class JettyAdapter implements JFryServer {
       }
     });
     return this;
-  }
-
-  private Supplier<String> bodyReader(HttpServletRequest request) {
-    return () -> Try.of(request::getInputStream).map(IOUtils::toString).get();
   }
 
   @Override
