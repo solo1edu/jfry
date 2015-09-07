@@ -9,14 +9,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class PicoRouter implements Predicate<String>, Function<String, Map<String, String>> {
+  private static final String PARTS_SEPARATOR = "/";
+  private static final String DYNAMIC_PART_PREFIX = ":";
   private final List<String> parts;
 
-  public PicoRouter(List<String> parts) {
+  private PicoRouter(List<String> parts) {
     this.parts = parts;
   }
 
   public static PicoRouter of(String path) {
-    return new PicoRouter(List.of(path.split("/")));
+    return new PicoRouter(List.of(path.split(PARTS_SEPARATOR)));
   }
 
   @Override
@@ -49,11 +51,11 @@ public class PicoRouter implements Predicate<String>, Function<String, Map<Strin
 
   @Override
   public String toString() {
-    return parts.join("/");
+    return parts.join(PARTS_SEPARATOR);
   }
 
   private boolean isDynamic(Tuple2<String, String> t) {
-    return t._1.startsWith(":");
+    return t._1.startsWith(DYNAMIC_PART_PREFIX);
   }
 
   private boolean isEqual(Tuple2<String, String> t) {

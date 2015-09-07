@@ -1,6 +1,7 @@
 package org.jfry;
 
 import javaslang.control.Option;
+import javaslang.unsafe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class Request {
   private final Map<String, String> params;
   private final Option<Object> body;
 
-  Request(HttpMethod method, String path, Map<String, String> headers, Map<String, String> query, Map<String, String> params, Option<Object> body) {
+  private Request(HttpMethod method, String path, Map<String, String> headers, Map<String, String> query, Map<String, String> params, Option<Object> body) {
     this.method = method;
     this.path = path;
     this.params = params;
@@ -47,6 +48,8 @@ public class Request {
     return Option.of(headers.get(name)).map(mapper);
   }
 
+  @unsafe
+  @SuppressWarnings("unchecked")
   public <T, U> Option<U> mapBody(Function<T, U> mapper) {
     return body.map(b -> (T) b).map(mapper);
   }
@@ -64,7 +67,6 @@ public class Request {
   }
 
   public Request withBody(Object body) {
-    System.out.println(body);
     return new Request(method, path, headers, query, params, Option.of(body));
   }
 
@@ -72,6 +74,8 @@ public class Request {
     return query;
   }
 
+  @unsafe
+  @SuppressWarnings("unchecked")
   public <T> T getBody() {
     return (T) body.get();
   }

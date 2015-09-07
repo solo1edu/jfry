@@ -1,6 +1,5 @@
 package org.jfry;
 
-import javaslang.Tuple2;
 import javaslang.collection.List;
 
 import java.util.HashMap;
@@ -14,7 +13,7 @@ public class Route {
   private final Handler handler;
   private final List<Condition> conditions;
 
-  public Route(HttpMethod method, PicoRouter router, Handler handler, List<Condition> conditions) {
+  private Route(HttpMethod method, PicoRouter router, Handler handler, List<Condition> conditions) {
     this.method = method;
     this.router = router;
     this.handler = handler;
@@ -65,11 +64,11 @@ public class Route {
         .fold(true, Boolean::logicalAnd);
   }
 
-  public boolean test(HttpMethod method) {
+  private boolean test(HttpMethod method) {
     return this.method == method;
   }
 
-  public boolean test(String path) {
+  private boolean test(String path) {
     return router.test(path);
   }
 

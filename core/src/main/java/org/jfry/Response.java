@@ -1,6 +1,7 @@
 package org.jfry;
 
 import javaslang.control.Option;
+import javaslang.unsafe;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -10,7 +11,7 @@ public class Response {
   private final Status status;
   private final Option<Object> body;
 
-  Response(Request request, Status status, Option<Object> body) {
+  private Response(Request request, Status status, Option<Object> body) {
     this.request = request;
     this.status = status;
     this.body = body;
@@ -24,6 +25,8 @@ public class Response {
     return status;
   }
 
+  @unsafe
+  @SuppressWarnings("unchecked")
   public <T> T getBody() {
     return (T) body.get();
   }
@@ -40,6 +43,8 @@ public class Response {
     return new Response(request, status, Option.of(body));
   }
 
+  @unsafe
+  @SuppressWarnings("unchecked")
   public <T, U> Option<U> mapBody(Function<T, U> mapper) {
     return body.map(b -> (T) b).map(mapper);
   }
