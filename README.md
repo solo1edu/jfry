@@ -1,4 +1,4 @@
-# JFry [![Build Status](https://travis-ci.org/ggalmazor/jfry.svg?branch=master)](https://travis-ci.org/ggalmazor/jfry) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ggalmazor/jfry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+# JFry [![Build Status](https://travis-ci.org/ggalmazor/jfry.svg?branch=master)](https://travis-ci.org/ggalmazor/jfry) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ggalmazor/jfry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Coverage Status](https://coveralls.io/repos/ggalmazor/jfry/badge.svg?branch=master&service=github)](https://coveralls.io/github/ggalmazor/jfry?branch=master)
 Java Fry is a web library inspired by Sinatra
 
 ## Getting started
@@ -43,7 +43,7 @@ jfry.get("/doge", request -> request.buildResponse.ok("wow"))
 And you need to allow access only to authenticated users, you could do something like:
  
 ```java
-// Providing that you have some authentication object like this one:
+// Provided that you have some authentication object like this one:
 
 class Authenticator {
   public Handler authenticate(Handler handler) {
@@ -65,7 +65,7 @@ This mode of operation is based on a decorator that returns a new function that 
 Sometimes, it's enough to manipulate the Request or the Response method. This is very useful when you need to deal with json content. Let's say that you need to receive a json object from your ursers and then return some other json to them. You could do:
  
 ```
-// Providing that you have some json serialization/deserialization engine like this:
+// Provided that you have some json serialization/deserialization engine like this:
 
 class JsonEngine {
   public RequestDecorator deserialize() {
