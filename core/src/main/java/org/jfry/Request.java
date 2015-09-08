@@ -40,12 +40,20 @@ public class Request {
     return Option.of(params.get(name)).map(mapper);
   }
 
+  public Map<String, String> getParamsMap() {
+    return params;
+  }
+
   public String header(String name) {
     return Option.of(headers.get(name)).orElseThrow(() -> new UnknownRequestHeaderException(this, name));
   }
 
   public <U> Option<U> mapHeader(String name, Function<String, U> mapper) {
     return Option.of(headers.get(name)).map(mapper);
+  }
+
+  public Map<String, String> getHeadersMap() {
+    return headers;
   }
 
   @unsafe

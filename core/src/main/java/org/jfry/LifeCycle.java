@@ -2,8 +2,13 @@ package org.jfry;
 
 import javaslang.control.Try;
 
-interface LifeCycle<T> {
+interface LifeCycle<T> extends Runnable {
   Try<T> start();
 
   Try<T> stop();
+
+  @Override
+  default void run() {
+    start();
+  }
 }
