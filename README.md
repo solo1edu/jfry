@@ -88,7 +88,7 @@ jfry.get("/doge", json.deserialize()
                       .andThen(json.serialize()));
 ```
 
-RequestDecorator and ResponseDecorator are Functiontal Interfaces declared in [org.jfry.decorators package](https://github.com/ggalmazor/jfry/tree/master/core/src/main/java/org/jfry/decorators).
+RequestDecorator and ResponseDecorator are Functiontal Interfaces declared in [com.github.ggalmazor.jfry.decorators package](https://github.com/ggalmazor/jfry/tree/master/core/src/main/java/org/jfry/decorators).
 
 In this case, we're taking advantage of the implicit type casts that occur inside Request and Response objects when you call to mapBody() or getBody(). You need to remember that this operations are unsafe. JFry will always think that you know what you're doing :)
  
