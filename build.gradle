@@ -10,11 +10,10 @@ def versions = [
 ]
 
 allprojects {
-  group 'com.github.ggalmazor.jfry'
+  group 'com.github.ggalmazor'
   version '0.0.10'
 
   apply plugin: 'java'
-  apply plugin: 'maven'
 
   sourceCompatibility = 1.8
 
@@ -46,5 +45,60 @@ project(':decorators') {
     compile project(':core')
     compile "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
     compile "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
+  }
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+signing {
+  sign configurations.archives
+}
+
+archivesBaseName = "jfry"
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'JFry'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description 'Java Fry is a web library inspired by Sinatra'
+        url 'https://github.com/ggalmazor/jfry'
+
+        scm {
+          connection 'https://github.com/ggalmazor/jfry.git'
+          developerConnection 'https://github.com/ggalmazor/jfry.git'
+          url 'https://github.com/ggalmazor/jfry.git'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'ggalmazor'
+            name 'Guillermo Gutierrez'
+            email 'ggalmazor@gmail.com'
+          }
+        }
+      }
+    }
   }
 }
