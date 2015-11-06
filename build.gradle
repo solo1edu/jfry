@@ -11,7 +11,7 @@ def versions = [
 
 allprojects {
   group 'com.github.ggalmazor'
-  version '0.0.10'
+  version '0.0.12'
 
   apply plugin: 'java'
 
@@ -48,6 +48,7 @@ project(':decorators') {
   }
 }
 
+/*
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -102,3 +103,4 @@ uploadArchives {
     }
   }
 }
+*/
