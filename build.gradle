@@ -10,12 +10,28 @@ def versions = [
 ]
 
 allprojects {
-  group 'com.github.ggalmazor'
-  version '0.0.12'
-
   apply plugin: 'java'
-
+  apply plugin: 'maven'
+  apply plugin: 'signing'
   sourceCompatibility = 1.8
+  archivesBaseName = "jfry"
+
+  group 'com.github.ggalmazor'
+  version '0.0.15'
+
+  task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+  }
+
+  task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+  signing {
+    sign configurations.archives
+  }
 
   repositories {
     mavenCentral()
@@ -31,16 +47,64 @@ allprojects {
     testCompile "junit:junit:$versions.junit"
     testCompile "org.assertj:assertj-core:$versions.assertj"
   }
-}
 
-project(':server:jetty') {
-  dependencies {
-    compile project(':core')
-    compile "com.mashape.unirest:unirest-java:$versions.unirest"
+  artifacts {
+    archives javadocJar, sourcesJar
+  }
+
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        pom.project {
+          name 'JFry'
+          packaging 'jar'
+          // optionally artifactId can be defined here
+          description 'Java Fry is a web library inspired by Sinatra'
+          url 'https://github.com/ggalmazor/jfry'
+
+          scm {
+            connection 'https://github.com/ggalmazor/jfry.git'
+            developerConnection 'https://github.com/ggalmazor/jfry.git'
+            url 'https://github.com/ggalmazor/jfry.git'
+          }
+
+          licenses {
+            license {
+              name 'The Apache License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+
+          developers {
+            developer {
+              id 'ggalmazor'
+              name 'Guillermo Gutierrez'
+              email 'ggalmazor@gmail.com'
+            }
+          }
+        }
+      }
+    }
   }
 }
 
+project(':core') {
+  archivesBaseName = "core"
+}
+
 project(':decorators') {
+  archivesBaseName = "decorators"
+
   dependencies {
     compile project(':core')
     compile "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
@@ -48,59 +112,20 @@ project(':decorators') {
   }
 }
 
-/*
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-
-signing {
-  sign configurations.archives
+project(':server') {
+  archivesBaseName = "server"
 }
 
-archivesBaseName = "jfry"
+project(':server:jetty') {
+  archivesBaseName = "jetty"
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      pom.project {
-        name 'JFry'
-        packaging 'jar'
-        // optionally artifactId can be defined here
-        description 'Java Fry is a web library inspired by Sinatra'
-        url 'https://github.com/ggalmazor/jfry'
-
-        scm {
-          connection 'https://github.com/ggalmazor/jfry.git'
-          developerConnection 'https://github.com/ggalmazor/jfry.git'
-          url 'https://github.com/ggalmazor/jfry.git'
-        }
-
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-        }
-
-        developers {
-          developer {
-            id 'ggalmazor'
-            name 'Guillermo Gutierrez'
-            email 'ggalmazor@gmail.com'
-          }
-        }
-      }
-    }
+  dependencies {
+    compile project(':core')
+    compile "com.mashape.unirest:unirest-java:$versions.unirest"
   }
 }
-*/
+
+
+
+
+
