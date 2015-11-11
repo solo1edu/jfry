@@ -54,6 +54,10 @@ public class JFry implements LifeCycle<JFry> {
     return new JFry(routes.prepend(Route.connect(path, handler)), server, port);
   }
 
+  public JFry patch(String path, Handler handler) {
+    return new JFry(routes.prepend(Route.patch(path, handler)), server, port);
+  }
+
   private Response handle(Request request) {
     return List.ofAll(routes)
         .findFirst(r -> r.test(request))

@@ -12,12 +12,13 @@ def versions = [
 allprojects {
   apply plugin: 'java'
   apply plugin: 'maven'
+  apply plugin: 'jacoco'
   apply plugin: 'signing'
   sourceCompatibility = 1.8
   archivesBaseName = "jfry"
 
   group 'com.github.ggalmazor'
-  version '0.0.17'
+  version '0.0.18'
 
   repositories {
     mavenCentral()

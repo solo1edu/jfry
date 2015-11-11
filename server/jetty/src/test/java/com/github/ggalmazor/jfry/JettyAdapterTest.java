@@ -2,6 +2,7 @@ package com.github.ggalmazor.jfry;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -64,4 +65,11 @@ public class JettyAdapterTest {
     assertThat(actualBytes).isEqualTo(expectedBytes);
   }
 
+  @Test
+  public void supports_PATCH_method() throws Exception {
+    startJFry(Route.patch("/foo", request->request.buildResponse().noContent()));
+    HttpResponse<InputStream> response = Unirest.patch("http://localhost:9999/foo").asBinary();
+    assertThat(response.getStatus()).isEqualTo(204);
+
+  }
 }

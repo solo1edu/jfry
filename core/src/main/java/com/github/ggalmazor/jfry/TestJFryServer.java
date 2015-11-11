@@ -64,6 +64,11 @@ public class TestJFryServer implements JFryServer {
     return simulate(HttpMethod.CONNECT, uri, List.of(headers).toJavaMap(Function.identity()), Option.none());
   }
 
+  @SafeVarargs
+  public final Response simulatePatch(String uri, String body, Tuple2<String, String>... headers) {
+    return simulate(HttpMethod.PATCH, uri, List.of(headers).toJavaMap(Function.identity()), Option.of(body));
+  }
+
   @Override
   public JFryServer atPort(int port) {
     return this;

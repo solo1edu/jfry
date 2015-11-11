@@ -52,6 +52,10 @@ public class Route {
     return new Route(HttpMethod.CONNECT, PicoRouter.of(path), handler, List.empty());
   }
 
+  public static Route patch(String path, Handler handler) {
+    return new Route(HttpMethod.PATCH, PicoRouter.of(path), handler, List.empty());
+  }
+
   public Route withConditions(Condition... conditions) {
     return new Route(method, router, handler, this.conditions.prependAll(List.<Condition>of(conditions)));
   }

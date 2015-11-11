@@ -156,5 +156,14 @@ public class JFryTest {
     assertThat(response.getBody().get()).isEqualTo("Very wow, much fancy");
   }
 
+  @Test
+  public void supports_PATCH_non_standard_method() throws Exception {
+    JFry.of(server, 8080)
+        .patch("/foo", request -> request.buildResponse().ok(request.getBody()))
+        .start();
+    Response response = server.simulatePatch("/foo", "very method");
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
+    assertThat(response.getBody().get()).isEqualTo("very method");
 
+  }
 }
