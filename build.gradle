@@ -20,7 +20,7 @@ allprojects {
   archivesBaseName = "jfry"
 
   group 'com.github.ggalmazor'
-  version '0.0.16'
+  version '0.0.17'
 
   task javadocJar(type: Jar) {
     classifier = 'javadoc'
