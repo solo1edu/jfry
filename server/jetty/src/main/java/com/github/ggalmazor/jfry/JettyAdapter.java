@@ -12,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,22 +60,25 @@ public class JettyAdapter implements JFryServer {
 
         // Response return
         response.setStatus(jfryResponse.getStatus().getCode());
-        headers.keySet().forEach(name -> response.addHeader(name, headers.get(name)));
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "");
         response.addHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", String.join(",", headers.keySet()));
-        jfryResponse.ifHasBody(_body -> Try.run(() -> {
-          PrintWriter writer = response.getWriter();
-          writer.write((String) _body);
-          writer.flush();
-          writer.close();
-        }).get());
-
+        jfryResponse.forEachHeader(response::setHeader);
+        jfryResponse.ifHasBody(_body -> Try.run(() -> IOUtils.write(
+            toByteArray(_body, response.getHeader("Content-Type")),
+            response.getOutputStream()
+        )).get());
         baseRequest.setHandled(true);
       }
     });
     return this;
+  }
+
+  private byte[] toByteArray(Object body, String contentTypeHeader) {
+    if (contentTypeHeader == null || contentTypeHeader.startsWith("text"))
+      return Try.of(() -> ((String) body).getBytes("UTF-8")).get();
+    return (byte[]) body;
   }
 
   @Override
@@ -90,6 +92,6 @@ public class JettyAdapter implements JFryServer {
 
   @Override
   public Try<JFryServer> stop() {
-    throw new RuntimeException("not yet implemented");
+    return Try.run(server::stop).mapTry(v -> this);
   }
 }

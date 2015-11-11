@@ -6,6 +6,7 @@ import javaslang.control.Option;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -31,8 +32,12 @@ public class Response {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getBody() {
-    return (T) body.get();
+  Object getBody() {
+    return body.get();
+  }
+
+  public void forEachHeader(BiConsumer<String, String> biConsumer) {
+    List.ofAll(headers.entrySet()).forEach(e -> biConsumer.accept(e.getKey(), e.getValue()));
   }
 
   public boolean hasBody() {
@@ -40,7 +45,7 @@ public class Response {
   }
 
   public void ifHasBody(Consumer<Object> consumer) {
-    body.peek(consumer);
+    body.forEach(consumer);
   }
 
   public Response withBody(Object body) {
