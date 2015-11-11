@@ -34,25 +34,25 @@ allprojects {
     testCompile "org.assertj:assertj-core:$versions.assertj"
   }
 
-  task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-  }
+  if (this.hasProperty('profile') && profile == "oss") {
+    task javadocJar(type: Jar) {
+      classifier = 'javadoc'
+      from javadoc
+    }
 
-  task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-  }
+    task sourcesJar(type: Jar) {
+      classifier = 'sources'
+      from sourceSets.main.allSource
+    }
 
-  signing {
-    sign configurations.archives
-  }
+    signing {
+      sign configurations.archives
+    }
 
-  artifacts {
-    archives javadocJar, sourcesJar
-  }
+    artifacts {
+      archives javadocJar, sourcesJar
+    }
 
-  if (this.hasProperty("profile") && profile == "oss")
     uploadArchives {
       repositories {
         mavenDeployer {
@@ -97,6 +97,7 @@ allprojects {
         }
       }
     }
+  }
 }
 
 project(':core') {
