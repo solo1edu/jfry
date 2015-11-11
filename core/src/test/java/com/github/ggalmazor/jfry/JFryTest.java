@@ -26,7 +26,7 @@ public class JFryTest {
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(response.hasBody()).isTrue();
-    assertThat(response.getBody()).isEqualTo("bar");
+    assertThat(response.getBody().get()).isEqualTo("bar");
   }
 
   @Test
@@ -51,7 +51,7 @@ public class JFryTest {
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(response.hasBody()).isTrue();
-    assertThat(response.getBody()).isEqualTo("123");
+    assertThat(response.getBody().get()).isEqualTo("123");
   }
 
   @Test
@@ -66,11 +66,11 @@ public class JFryTest {
 
     assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(getResponse.hasBody()).isTrue();
-    assertThat(getResponse.getBody()).isEqualTo("bar");
+    assertThat(getResponse.getBody().get()).isEqualTo("bar");
 
     assertThat(postResponse.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(postResponse.hasBody()).isTrue();
-    assertThat(postResponse.getBody()).isEqualTo("baz");
+    assertThat(postResponse.getBody().get()).isEqualTo("baz");
   }
 
   @Test
@@ -99,7 +99,7 @@ public class JFryTest {
     ).forEach(response -> {
       assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
       assertThat(response.hasBody()).isTrue();
-      assertThat(response.getBody()).isEqualTo("bar");
+      assertThat(response.getBody().get()).isEqualTo("bar");
     });
   }
 
@@ -113,7 +113,7 @@ public class JFryTest {
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(response.hasBody()).isTrue();
-    assertThat(response.getBody()).isEqualTo("123");
+    assertThat(response.getBody().get()).isEqualTo("123");
   }
 
   @Test
@@ -126,7 +126,7 @@ public class JFryTest {
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(response.hasBody()).isTrue();
-    assertThat(response.getBody()).isEqualTo("123");
+    assertThat(response.getBody().get()).isEqualTo("123");
   }
 
   @Test
@@ -153,7 +153,7 @@ public class JFryTest {
         .start();
 
     Response response = server.simulatePost("/foo", "Very wow, much fancy");
-    assertThat(response.getBody()).isEqualTo("Very wow, much fancy");
+    assertThat(response.getBody().get()).isEqualTo("Very wow, much fancy");
   }
 
 

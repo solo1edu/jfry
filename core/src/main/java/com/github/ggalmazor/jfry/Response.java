@@ -32,8 +32,8 @@ public class Response {
   }
 
   @SuppressWarnings("unchecked")
-  Object getBody() {
-    return body.get();
+  public Option<Object> getBody() {
+    return body;
   }
 
   public void forEachHeader(BiConsumer<String, String> biConsumer) {
