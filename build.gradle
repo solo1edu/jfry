@@ -24,6 +24,13 @@ allprojects {
     mavenCentral()
   }
 
+  jacocoTestReport {
+    reports {
+      xml.enabled = true
+      html.enabled = true
+    }
+  }
+
   dependencies {
     compile "org.eclipse.jetty:jetty-server:$versions.jetty"
     compile "org.eclipse.jetty:jetty-servlet:$versions.jetty"
