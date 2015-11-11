@@ -1,5 +1,6 @@
 package com.github.ggalmazor.jfry;
 
+import javaslang.control.Match;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import org.apache.commons.io.IOUtils;
@@ -12,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,20 +68,22 @@ public class JettyAdapter implements JFryServer {
         response.addHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", String.join(",", headers.keySet()));
         jfryResponse.forEachHeader(response::setHeader);
-        jfryResponse.ifHasBody(_body -> Try.run(() -> IOUtils.write(
-            toByteArray(_body, response.getHeader("Content-Type")),
-            response.getOutputStream()
-        )).get());
+        jfryResponse.ifHasBody(_body -> {
+          if (_body instanceof InputStream) {
+            Try.run(() -> IOUtils.copy(((InputStream) _body), response.getOutputStream())).get();
+          } else {
+            byte[] bytes = Match
+                .whenApplicable((byte[] b) -> b).thenApply()
+                .whenApplicable(ByteBuffer::array).thenApply()
+                .otherwise(b -> Try.of(() -> b.toString().getBytes("utf-8")).get())
+                .apply(_body);
+            Try.run(() -> IOUtils.write(bytes, response.getOutputStream())).get();
+          }
+        });
         baseRequest.setHandled(true);
       }
     });
     return this;
-  }
-
-  private byte[] toByteArray(Object body, String contentTypeHeader) {
-    if (contentTypeHeader == null || contentTypeHeader.startsWith("text"))
-      return Try.of(() -> ((String) body).getBytes("UTF-8")).get();
-    return (byte[]) body;
   }
 
   @Override
