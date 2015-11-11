@@ -1,6 +1,5 @@
 package com.github.ggalmazor.jfry;
 
-import com.github.ggalmazor.jfry.*;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import org.apache.commons.io.IOUtils;
@@ -50,7 +49,10 @@ public class JettyAdapter implements JFryServer {
 
         Map<String, String> query = decodeQueryString(request.getQueryString());
 
-        Option<Object> body = Try.of(request::getInputStream).mapTry(IOUtils::toString).map(b -> (Object) b).toOption();
+        Option<Object> body = Try.of(request::getInputStream)
+            .mapTry(IOUtils::toString)
+            .map(b -> (Object) b)
+            .toOption();
 
         Request jfryRequest = Request.of(method, request.getPathInfo(), headers, query, body);
 
@@ -69,7 +71,7 @@ public class JettyAdapter implements JFryServer {
           writer.write((String) _body);
           writer.flush();
           writer.close();
-        }));
+        }).get());
 
         baseRequest.setHandled(true);
       }

@@ -1,8 +1,5 @@
 package com.github.ggalmazor.jfry;
 
-import com.github.ggalmazor.jfry.Response;
-import com.github.ggalmazor.jfry.Route;
-import com.github.ggalmazor.jfry.TestJFryServer;
 import javaslang.Tuple2;
 import javaslang.collection.List;
 import org.junit.Before;
