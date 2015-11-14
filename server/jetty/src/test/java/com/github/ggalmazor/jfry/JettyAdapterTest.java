@@ -2,7 +2,6 @@ package com.github.ggalmazor.jfry;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -14,10 +13,13 @@ import java.nio.file.Paths;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JettyAdapterTest {
+  private static final int PORT = 9999;
+  private static final String BASE_URL = "http://localhost:" + PORT;
   private JFry jfry;
 
   private void startJFry(Route route) {
-    jfry = JFry.of(new JettyAdapter(), 9999)
+    JettyAdapter server = new JettyAdapter(PORT, corsExposeHeaders).enableCORS();
+    jfry = JFry.of(server)
         .register(route);
 
     jfry.start();
@@ -32,7 +34,7 @@ public class JettyAdapterTest {
   public void starts_a_Jetty_server_and_uses_it_to_serve_requests() throws Exception {
     startJFry(Route.get("/foo", request -> request.buildResponse().ok("bar")));
 
-    HttpResponse<String> response = Unirest.get("http://localhost:9999/foo").asString();
+    HttpResponse<String> response = Unirest.get(BASE_URL + "/foo").asString();
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getCode());
     assertThat(response.getBody()).isEqualTo("bar");
   }
@@ -41,7 +43,7 @@ public class JettyAdapterTest {
   public void decodes_query_string_params() throws Exception {
     startJFry(Route.get("/foo", request -> request.buildResponse().ok(request.param("bar"))));
 
-    HttpResponse<String> response = Unirest.get("http://localhost:9999/foo?bar=123").asString();
+    HttpResponse<String> response = Unirest.get(BASE_URL + "/foo?bar=123").asString();
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getCode());
     assertThat(response.getBody()).isEqualTo("123");
   }
@@ -50,7 +52,7 @@ public class JettyAdapterTest {
   public void encodes_response_body_as_binary_data_if_contains_byte_array() throws Exception {
     byte[] expectedBytes = Files.readAllBytes(Paths.get(JettyAdapterTest.class.getResource("/image.jpeg").toURI()));
     startJFry(Route.get("/foo", request -> request.buildResponse().ok(expectedBytes)));
-    HttpResponse<InputStream> response = Unirest.get("http://localhost:9999/foo").asBinary();
+    HttpResponse<InputStream> response = Unirest.get(BASE_URL + "/foo").asBinary();
     byte[] actualBytes = IOUtils.toByteArray(response.getBody());
     assertThat(actualBytes).isEqualTo(expectedBytes);
   }
@@ -59,7 +61,7 @@ public class JettyAdapterTest {
   public void encodes_response_body_as_binary_data_if_contains_InputStream() throws Exception {
     InputStream is = JettyAdapterTest.class.getResourceAsStream("/image.jpeg");
     startJFry(Route.get("/foo", request -> request.buildResponse().ok(is)));
-    HttpResponse<InputStream> response = Unirest.get("http://localhost:9999/foo").asBinary();
+    HttpResponse<InputStream> response = Unirest.get(BASE_URL + "/foo").asBinary();
     byte[] actualBytes = IOUtils.toByteArray(response.getBody());
     byte[] expectedBytes = Files.readAllBytes(Paths.get(JettyAdapterTest.class.getResource("/image.jpeg").toURI()));
     assertThat(actualBytes).isEqualTo(expectedBytes);
@@ -67,8 +69,8 @@ public class JettyAdapterTest {
 
   @Test
   public void supports_PATCH_method() throws Exception {
-    startJFry(Route.patch("/foo", request->request.buildResponse().noContent()));
-    HttpResponse<InputStream> response = Unirest.patch("http://localhost:9999/foo").asBinary();
+    startJFry(Route.patch("/foo", request -> request.buildResponse().noContent()));
+    HttpResponse<InputStream> response = Unirest.patch(BASE_URL + "/foo").asBinary();
     assertThat(response.getStatus()).isEqualTo(204);
 
   }

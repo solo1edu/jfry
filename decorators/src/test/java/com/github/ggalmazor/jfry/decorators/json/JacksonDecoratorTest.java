@@ -24,7 +24,7 @@ public class JacksonDecoratorTest {
 
     Handler decoratedHandler = Handler.of(JacksonDecorator.deserialize().andThen(handler).andThen(JacksonDecorator.serialize()));
 
-    JFry.of(server, 8080)
+    JFry.of(server)
         .post("/foo", decoratedHandler)
         .start();
 
@@ -39,7 +39,7 @@ public class JacksonDecoratorTest {
   public void less_verbose_version() throws Exception {
     Handler handler = req -> req.buildResponse().ok(req.<Doge>getBody());
 
-    JFry.of(server, 8080)
+    JFry.of(server)
         .post("/foo", JacksonDecorator.wrap(handler))
         .start();
 

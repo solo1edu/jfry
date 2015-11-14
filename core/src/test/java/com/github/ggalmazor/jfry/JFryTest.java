@@ -18,7 +18,7 @@ public class JFryTest {
 
   @Test
   public void resolves_simple_paths() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo", req -> req.buildResponse().ok("bar"))
         .start();
 
@@ -31,7 +31,7 @@ public class JFryTest {
 
   @Test
   public void returns_not_found_response_if_no_handler_is_found() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo", req -> req.buildResponse().ok("bar"))
         .start();
 
@@ -43,7 +43,7 @@ public class JFryTest {
 
   @Test
   public void makes_dynamic_path_part_values_available() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo/:bar/baz", req -> req.buildResponse().ok(req.param("bar")))
         .start();
 
@@ -56,7 +56,7 @@ public class JFryTest {
 
   @Test
   public void resolves_handlers_depending_on_http_method() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo", req -> req.buildResponse().ok("bar"))
         .post("/foo", req -> req.buildResponse().ok("baz"))
         .start();
@@ -75,7 +75,7 @@ public class JFryTest {
 
   @Test
   public void supports_all_http_1_1_methods() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .register(
             Route.options("/foo", req -> req.buildResponse().ok("bar")),
             Route.get("/foo", req -> req.buildResponse().ok("bar")),
@@ -105,7 +105,7 @@ public class JFryTest {
 
   @Test
   public void makes_query_string_params_available() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo", req -> req.buildResponse().ok(req.param("bar")))
         .start();
 
@@ -118,7 +118,7 @@ public class JFryTest {
 
   @Test
   public void dynamic_path_parts_have_precedence_over_query_string_params() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .get("/foo/:bar/baz", req -> req.buildResponse().ok(req.param("bar")))
         .start();
 
@@ -135,7 +135,7 @@ public class JFryTest {
         .mapHeader("doge", doge -> doge.equals("very wow"))
         .orElse(Boolean.FALSE);
 
-    JFry.of(server, 8080)
+    JFry.of(server)
         .register(Route.get("/foo", req -> req.buildResponse().ok("bar")).withConditions(condition))
         .start();
 
@@ -148,7 +148,7 @@ public class JFryTest {
 
   @Test
   public void makes_request_body_available() {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .post("/foo", request -> request.buildResponse().ok(request.getBody()))
         .start();
 
@@ -158,7 +158,7 @@ public class JFryTest {
 
   @Test
   public void supports_PATCH_non_standard_method() throws Exception {
-    JFry.of(server, 8080)
+    JFry.of(server)
         .patch("/foo", request -> request.buildResponse().ok(request.getBody()))
         .start();
     Response response = server.simulatePatch("/foo", "very method");

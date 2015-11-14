@@ -44,7 +44,7 @@ public class Response {
     return body.isDefined();
   }
 
-  public void ifHasBody(Consumer<Object> consumer) {
+  public void forEachBody(Consumer<Object> consumer) {
     body.forEach(consumer);
   }
 

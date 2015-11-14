@@ -70,11 +70,6 @@ public class TestJFryServer implements JFryServer {
   }
 
   @Override
-  public JFryServer atPort(int port) {
-    return this;
-  }
-
-  @Override
   public JFryServer onRequest(Handler handler) {
     this.handler = handler;
     return this;

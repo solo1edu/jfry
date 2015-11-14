@@ -56,24 +56,28 @@ public class Route {
     return new Route(HttpMethod.PATCH, PicoRouter.of(path), handler, List.empty());
   }
 
+  HttpMethod getMethod() {
+    return method;
+  }
+
   public Route withConditions(Condition... conditions) {
     return new Route(method, router, handler, this.conditions.prependAll(List.<Condition>of(conditions)));
   }
 
   public boolean test(Request request) {
     return List.<Boolean>empty()
-        .prepend(test(request.getMethod()))
-        .prepend(test(request.getPath()))
+        .prepend(testMethod(request))
+        .prepend(testPath(request))
         .prependAll(conditions.map(c -> c.test(request)))
         .fold(true, Boolean::logicalAnd);
   }
 
-  private boolean test(HttpMethod method) {
-    return this.method == method;
+  public boolean testMethod(Request request) {
+    return this.method == request.getMethod();
   }
 
-  private boolean test(String path) {
-    return router.test(path);
+  public boolean testPath(Request request) {
+    return router.test(request.getPath());
   }
 
   public Response apply(Request request) {

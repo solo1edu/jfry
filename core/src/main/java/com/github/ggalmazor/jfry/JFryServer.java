@@ -19,8 +19,25 @@ public interface JFryServer extends LifeCycle<JFryServer> {
         .toJavaMap(Function.identity());
   }
 
-  JFryServer atPort(int port);
+  JFryServer onRequest(ServerHandler handler);
 
-  JFryServer onRequest(Handler handler);
+  class ServerHandler {
+    private final Handler handler;
+    private final Function<Request, List<HttpMethod>> methodCollector;
+
+    public ServerHandler(Handler handler, Function<Request, List<HttpMethod>> methodCollector) {
+      this.handler = handler;
+      this.methodCollector = methodCollector;
+    }
+
+    Response handle(Request request) {
+      return handler.apply(request);
+    }
+
+
+    List<HttpMethod> collectAvailableMethods(Request request) {
+      return methodCollector.apply(request);
+    }
+  }
 
 }
